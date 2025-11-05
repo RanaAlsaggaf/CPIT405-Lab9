@@ -10,20 +10,26 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
-  const doSearch = async () => {
-    setErr("");
-    setLoading(true);
-    try {
-      const data = await searchRecipes(q, 12);
-      setItems(data.results || []);
-    } catch (e) {
-      setErr(
-        e.message.includes("402") ? "API quota exceeded. Try later." : e.message
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+const doSearch = async () => {
+  setErr("");
+  setLoading(true);
+  try {
+    const key = "30ae2b54e5c14de49668e20714670258"; // your Spoonacular key
+    const url = `https://api.spoonacular.com/recipes/complexSearch?query=${encodeURIComponent(
+      q
+    )}&addRecipeInformation=true&number=12&apiKey=${key}`;
+
+    const r = await fetch(url);
+    const data = await r.json();
+    if (!r.ok) throw new Error(data?.message || `HTTP ${r.status}`);
+
+    setItems(data.results || []);
+  } catch (e) {
+    setErr(e.message.includes("402") ? "API quota exceeded. Try later." : e.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <>
